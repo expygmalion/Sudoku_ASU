@@ -1,0 +1,32 @@
+cout << ANSI_GREEN <<"1. Easy\n"<< ANSI_RESET;
+    cout << ANSI_YELLOW <<"2. Intermediate\n" << ANSI_RESET;
+    cout << ANSI_RED <<"3. Hard\n" << ANSI_RESET;
+
+
+    // create a boolean 2d array of which all are false 
+    // print grid takes emptyCells[row][col] and sets it to true
+    // color is changed according to true in if statement
+
+   # for (int i = 0; i < GRID_SIZE; ++i) {
+            for (int j = 0; j < GRID_SIZE; ++j) {
+                if (i == row && j == col) {
+                    cout << ANSI_RED << "[" << sudokuGrid[i][j] << "] " << ANSI_RESET;
+                } else {
+                    if (emptycells[i][j] == false ) { 
+                    cout << ANSI_YELLOW << " " << sudokuGrid[i][j] << "  " << ANSI_RESET ;
+                    }
+                    else { 
+                        cout << ANSI_ORANGE << " " << sudokuGrid[i][j] << "  " << ANSI_RESET;
+                    }
+                }
+                if ((j + 1) % 3 == 0 && j != GRID_SIZE - 1) {
+                    cout << ANSI_PURPLE << "| " << ANSI_RESET; // Print vertical line after every 3 columns
+                }
+            }
+            cout << endl;
+            if ((i + 1) % 3 == 0 && i != GRID_SIZE - 1) {
+                cout << ANSI_PURPLE << "------------+-------------+------------" << ANSI_RESET << endl; // Print horizontal line after every 3 rows
+            }
+        }
+
+        #
