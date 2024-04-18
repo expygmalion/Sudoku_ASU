@@ -16,13 +16,8 @@ const string ANSI_ORANGE = "\033[38;5;208m";
 const string ANSI_GREEN = "\033[1;32m";
 
 
-bool verifySolution(int grid[GRID_SIZE][GRID_SIZE]){
 
 
-//زول يكتب اللوجيك هنا مسألتها بسيطة وما بتحتاج تفكير كتير 
-
-return true;
-}
 bool validateInput(int &number) {
     cin >> number;
     if (cin.fail() || number < 1 || number > 9) {
@@ -262,35 +257,7 @@ int main() {
             case ' ':
     handleInput(number, emptyCells, sudokuGrid, row, col);
     break;
-    case 'C': // Confirm solution
-        case 'c':
-            // Check if all cells are filled
-            bool allCellsFilled = true;
-            for (int i = 0; i < GRID_SIZE; ++i) {
-                for (int j = 0; j < GRID_SIZE; ++j) {
-                    if (sudokuGrid[i][j] == 0) {
-                        allCellsFilled = false;
-                        break;
-                    }
-                }
-                if (!allCellsFilled) {
-                    break;
-                }
-            }
-
-            if (allCellsFilled) {
-                // Validate Sudoku solution
-                if (verifySolution(sudokuGrid)) {
-                    cout << "Congratulations! Your solution is valid." << endl;
-                    solutionValidated = true;
-                } else {
-                    cout << "Your solution is invalid. Please correct it before confirming." << endl;
-                }
-            } else {
-                cout << "Please fill all cells before confirming." << endl;
-            }
-            break;
-
+    
     
 // Inside the switch statement case 8 (backspace)
 case 8: // ASCII value for backspace
