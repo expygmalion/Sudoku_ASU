@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib> // For rand() and srand()
 #include <ctime>   // For time()
+
 #define GRID_SIZE 9
 using namespace std;
 
@@ -131,7 +132,7 @@ int main() {
     cout << "Choose difficulty level:\n";
     cout << "1. Easy\n";
     cout << "2. Intermediate\n";
-    cout << "3. Hard\n";
+    cout << "3. Hard \n";
     cout << "Enter your choice: ";
     cin >> difficulty;
 

@@ -5,6 +5,7 @@
 #include <limits> // For numeric_limits
 #include <chrono> // For timer
 #include <thread> // For sleep
+#include <algorithm>
 
 #define GRID_SIZE 9
 using namespace std;
@@ -18,6 +19,52 @@ const string ANSI_ORANGE = "\033[38;5;208m";
 const string ANSI_GREEN = "\033[1;32m";
 const string ANSI_D_BLUE = "\033[38;5;23m";
 const string ANSI_FLAME = "\033[38;5;202m";
+
+// Structure to represent a player's data
+struct Player {
+    string username;
+    int score;
+};
+const int MAX_PLAYERS = 10;
+Player leaderboard[MAX_PLAYERS];
+
+
+void exitGame(bool &puzzleSolved)
+{
+    system("cls");
+    cout << "Are you sure you want to exit? Your progress is not saved\n\nEnter Y to Confirm, Enter Any Other Key to Cancel " << endl;
+    char confirmation;
+    cin >> confirmation;
+    if (confirmation == 'y' || confirmation == 'Y')
+    {
+        puzzleSolved = true;
+        cout << ANSI_FLAME <<"\n See You next time, friend!" << ANSI_RESET;
+    }
+    else
+    {
+        puzzleSolved = false;
+    }
+}
+ 
+void printScore(int elapsedSeconds, int numToDelete, int& userScore) {
+    if (numToDelete == 2) {
+     
+        userScore = numToDelete * 27 * (0.1*elapsedSeconds);
+    } else if (numToDelete == 54) {
+    
+        userScore = numToDelete * 81 * (0.1*elapsedSeconds);
+    } else if (numToDelete == 63) {
+    
+        userScore = numToDelete * 729 * (0.1*elapsedSeconds);
+    } else {
+
+              userScore = numToDelete * numToDelete * (0.1*elapsedSeconds);
+    }
+    cout << userScore;
+}
+
+
+
 
 bool validateInput(int &number)
 {
@@ -78,14 +125,16 @@ bool verifySolution(int sudokuGrid[GRID_SIZE][GRID_SIZE], int comparsionGrid[GRI
                 // If any corresponding elements are different, arrays are not identical
                 return false;
             }
-        } 
+        }
     }
     // All corresponding elements are the same, arrays are identical
 
     return true;
 }
 
-void endGame(int sudokuGrid[GRID_SIZE][GRID_SIZE], int comparsionGrid[GRID_SIZE][GRID_SIZE], bool allCellsFilled, bool &solutionValidated, bool &puzzleSolved)
+void endGame(int sudokuGrid[GRID_SIZE][GRID_SIZE], int comparsionGrid[GRID_SIZE][GRID_SIZE],
+             bool allCellsFilled, bool &solutionValidated, bool &puzzleSolved, int elapsedSeconds,
+            int &userScore, int numToDelete)
 {
     solutionValidated = false;
     allCellsFilled = true;
@@ -134,7 +183,50 @@ void endGame(int sudokuGrid[GRID_SIZE][GRID_SIZE], int comparsionGrid[GRID_SIZE]
         cout << "\t\t\t\nPlease fill all cells before confirming, press any key to continue" << endl;
         _getch();
     }
+
+    if (numToDelete == 2) {
+        userScore = numToDelete * 50 * elapsedSeconds;
+    } else if (numToDelete == 54) {
+        userScore = numToDelete * 150 * elapsedSeconds;
+    } else if (numToDelete == 63) {
+        userScore = numToDelete * 200 * elapsedSeconds;
+    } 
+    // Update player data
+    Player currentPlayer; 
+    cout << "Please enter your username: ";
+    cin >> currentPlayer.username;
+    currentPlayer.score = userScore;
+    
+    // Add current player to the leaderboard
+    leaderboard[MAX_PLAYERS - 1] = currentPlayer;
+    
+    // Sort leaderboard by score
+    sort(begin(leaderboard), end(leaderboard), [](const Player &a, const Player &b) {
+        return a.score > b.score;
+    });
+
+    // Display leaderboard
+    system("cls");
+    cout << "Leaderboard:" << endl;
+    cout << "Position\tName\t\tScore" << endl;
+    for (int i = 0; i < MAX_PLAYERS; ++i) {
+        cout << i + 1 << "\t\t" << leaderboard[i].username << "\t\t" << leaderboard[i].score << endl;
+        if (leaderboard[i].username == currentPlayer.username && leaderboard[i].score == currentPlayer.score) {
+            cout << "Your Position: " << i + 1 << "\tYour Score: " << leaderboard[i].score << endl;
+        }
+    }
+
+    
+    
+
 }
+
+void confirmSolution(int sudokuGrid[GRID_SIZE][GRID_SIZE], int comparsionGrid[GRID_SIZE][GRID_SIZE], bool &allCellsFilled, bool &solutionValidated, bool &puzzleSolved, int elapsedSeconds, int &userScore, int numToDelete)
+{
+    endGame(sudokuGrid, comparsionGrid, allCellsFilled, solutionValidated, puzzleSolved, elapsedSeconds, userScore, numToDelete);
+
+}
+
 // Function to print the Sudoku grid
 void printGrid(int grid[GRID_SIZE][GRID_SIZE], int numToDelete, bool localize[GRID_SIZE][GRID_SIZE])
 {
@@ -361,6 +453,7 @@ void printTimer(int elapsedSeconds)
 
 int main()
 {
+    
     // Seed the random number generator
     int difficulty;
     cout << "Choose difficulty level:\n";
@@ -381,7 +474,7 @@ int main()
     switch (difficulty)
     {
     case 1:
-        numToDelete = 1;
+        numToDelete = 2;
         break;
     case 2:
         numToDelete = 54;
@@ -425,11 +518,12 @@ int main()
     {
         // Clear screen
         system("cls");
-
+        int userScore = 0; 
         // Calculate elapsed time
         time_t currentTime = time(NULL);
         int elapsedSeconds = difftime(currentTime, startTime);
         printTimer(elapsedSeconds);
+        printScore(elapsedSeconds, numToDelete, userScore);
 
 
 
@@ -438,12 +532,13 @@ int main()
              << "          Instructions       " << ANSI_RESET << endl;
         cout << "  ###########################" << endl;
         cout << "# Arrow Keys: Navigate      #" << endl;
-        cout << "# Space: Select/delete Cell #" << endl;
+        cout << "# Space: Select Cell        #" << endl;
+        cout << "# BackSpace: Delete Cell    #" << endl;
         cout << "# E: Exit Game              #" << endl;
         cout << "# C: Confirm Solution       #" << endl;
         cout << "# Enter: Confirm Number     #" << endl;
         cout << "#Level: ";
-        if (numToDelete == 1)
+        if (numToDelete == 2)
         {
             cout << ANSI_GREEN << "Easy              "
                  << ANSI_RESET << "  #\n";
@@ -502,35 +597,16 @@ int main()
         switch (input)
         {
         case ' ':
-            handleInput(number, emptyCells, sudokuGrid, row, col);
-            break;
-        case 'C': // Confirm solution
-        case 'c':
-
-            endGame(sudokuGrid, comparsionGrid, allCellsFilled, solutionValidated, puzzleSolved);
-            
-            cout << "\n" << elapsedSeconds<< "\n";
-            
-            break;
-        case 'E':
-        case 'e':
-            system("cls");
-            cout << "Are you sure you want to exit?\n\nEnter Y to Confirm, Enter Any Other Key to Cancel " << endl;
-            char confirmation;
-            cin >> confirmation;
-            if (confirmation == 'y' || confirmation == 'Y')
-            {
-                puzzleSolved = true;
-                cout << ANSI_FLAME <<"\n See You next time, friend!" << ANSI_RESET;
-            }
-            else
-            {
-
-                puzzleSolved = false;
-                break;
-            }
-
-            break;
+        handleInput(number, emptyCells, sudokuGrid, row, col);
+        break;
+    case 'C': // Confirm solution
+    case 'c':
+        confirmSolution(sudokuGrid, comparsionGrid, allCellsFilled, solutionValidated, puzzleSolved, elapsedSeconds, userScore, numToDelete);
+        break;
+    case 'E':
+    case 'e':
+        exitGame(puzzleSolved);
+        break;
 
             // Inside the switch statement case 8 (backspace)
         case 8: // ASCII value for backspace
@@ -572,3 +648,5 @@ int main()
     system("pause");
     return 0;
 }
+
+

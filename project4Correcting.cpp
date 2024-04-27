@@ -13,14 +13,13 @@ const string ANSI_YELLOW = "\033[1;33m";
 const string ANSI_PURPLE = "\033[1;35m";
 const string ANSI_ORANGE = "\033[38;5;208m";
 const string ANSI_GREEN = "\033[1;32m";
-const string ANSI_D_BLUE = "\033[38;5;23m"; // Dark Blue
-const string ANSI_FLAME = "\033[38;5;202m"; // Flame
-const string ANSI_LIME = "\033[38;5;154m";  // Lime
+const string ANSI_D_BLUE = "\033[38;5;23m"; 
+const string ANSI_FLAME = "\033[38;5;202m"; 
 
 bool validateInput(int &number)
 {
     cin >> number;
-    if (cin.fail() || number < 1 || number > 9)
+    if (cin.fail() || number < 0 || number > 9)
     {
         // Clear input buffer
         cin.clear();
@@ -37,11 +36,12 @@ void handleInput(int &number, bool emptyCells[GRID_SIZE][GRID_SIZE], int sudokuG
     if (!emptyCells[row][col])
     {
         cout << "This cell contains a fixed number and cannot be modified." << endl;
+        _getch();
         return;
     }
     if (sudokuGrid[row][col] == 0)
     {
-        cout << "Enter number (1-9): ";
+        cout << ANSI_GREEN << "Enter 0 to leave it empty \n\nEnter the desired number (0-9): " << ANSI_RESET;
         while (!validateInput(number))
         {
             cout << "Enter number (1-9): ";
@@ -169,7 +169,6 @@ void printGrid(int grid[GRID_SIZE][GRID_SIZE], int numToDelete, bool localize[GR
     }
 }
 
-#include <cstdlib> // For rand()
 
 void generateUniqueRandomNumbers(int &a, int &b, int &c, int &d, int &e, int &f, int &g, int &h, int &i)
 {
@@ -351,14 +350,18 @@ void plugAllElementsToAnother(int a, int b, int c, int d, int e, int f,
 int main()
 {
     // Seed the random number generator
+    srand(time(0)); 
     int difficulty;
     cout << "Choose difficulty level:\n";
     cout << ANSI_GREEN << "1. Easy\n"
          << ANSI_RESET;
     cout << ANSI_YELLOW << "2. Intermediate\n"
          << ANSI_RESET;
-    cout << ANSI_RED << "3. Hard\n"
+    cout << ANSI_RED << "3. Hard \n"
          << ANSI_RESET;
+    cout << ANSI_RED << "4. Random\n"
+         << ANSI_RESET;
+    cout << ANSI_FLAME << "Any other key: Exit.\n\n" << ANSI_RESET; 
     cout << "Enter your choice: ";
     cin >> difficulty;
 
@@ -374,12 +377,15 @@ int main()
     case 3:
         numToDelete = 63;
         break;
+    case 4:
+        numToDelete = rand() % 65 + 1 ;
+    break;
     default:
         cout << "Invalid choice. Exiting...\n";
         return 1;
     }
 
-    // Initialize variables
+    // Initialize grid variables
     int a, b, c, d, e, f, g, h, i;
     int sudokuGrid[GRID_SIZE][GRID_SIZE] = {0};
     int comparsionGrid[GRID_SIZE][GRID_SIZE] = {0};
@@ -388,6 +394,7 @@ int main()
     srand(time(0));
     // Assign random numbers to variables
     generateUniqueRandomNumbers(a, b, c, d, e, f, g, h, i);
+    // Plug random nubers in their positions 
     plugAllElements(a, b, c, d, e, f, g, h, i, sudokuGrid);
     plugAllElementsToAnother(a, b, c, d, e, f, g, h, i, comparsionGrid);
 
@@ -397,7 +404,7 @@ int main()
 
     int row = 0, col = 0;
     int number;
-
+    // initialize logic variables
     bool allCellsFilled;
     bool solutionValidated = false;
     bool puzzleSolved = false;
@@ -408,28 +415,34 @@ int main()
         system("cls");
 
         // Print instructions
-
-        cout << "###########################" << endl;
-        cout << "# Arrow Keys: Navigate    #" << endl;
-        cout << "# Space: Select Cell      #" << endl;
-        cout << "# C: Confirm Number       #" << endl;
-        cout << "# Enter: Confirm Number   #" << endl;
+        cout << ANSI_FLAME << 
+        "          Instructions       " << ANSI_RESET << endl;
+        cout << "  ###########################" << endl;
+        cout << "# Arrow Keys: Navigate      #" << endl;
+        cout << "# Space: Select/delete Cell #" << endl;
+        cout << "# E: Exit Game              #" << endl;
+        cout << "# C: Confirm Solution       #" << endl;
+        cout << "# Enter: Confirm Number     #" << endl;
         cout << "#Level: ";
-
         if (numToDelete == 1)
         {
             cout << ANSI_GREEN << "Easy              "
-                 << ANSI_RESET<< "#\n";
+                 << ANSI_RESET<< "  #\n";
         }
         else if (numToDelete == 54)
         {
             cout << ANSI_YELLOW << "Intermediate      "
-                 << ANSI_RESET<< "#\n";
+                 << ANSI_RESET<< "  #\n";
         }
         else if (numToDelete == 63)
         {
             cout << ANSI_RED << "Hard              "
-                 << ANSI_RESET << "#\n";
+                 << ANSI_RESET << "  #\n";
+        } 
+        else {
+             cout << ANSI_RED << "random            "
+                 << ANSI_RESET << "  #\n";
+
         }
         cout << "###########################" << endl;
 
@@ -477,6 +490,24 @@ int main()
 
             endGame(sudokuGrid, comparsionGrid, allCellsFilled, solutionValidated, puzzleSolved);
             break;
+        case 'E':
+        case 'e':
+        system ("cls");
+        cout << "Are you sure you want to exit?\n\n Enter Y to Confirm\t Enter Any Other Key to Cancel " << endl;
+        char confirmation;
+        cin >> confirmation;
+        if (confirmation == 'y' || confirmation == 'Y' )
+        {
+            puzzleSolved = true;
+            cout << "See You next time, old friend!"; 
+        } else {
+            
+            puzzleSolved = false;
+            break; 
+
+        }
+
+        break;
 
             // Inside the switch statement case 8 (backspace)
         case 8: // ASCII value for backspace
