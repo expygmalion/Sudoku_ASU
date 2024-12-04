@@ -66,12 +66,14 @@ Run the compiled game:
 
 ### Code for ANSI color output:
 ```cpp
-const string ANSI_RESET = "[0m";
-const string ANSI_RED = "[1;31m";
-const string ANSI_YELLOW = "[1;33m";
-const string ANSI_PURPLE = "[1;35m";
-const string ANSI_ORANGE = "[38;5;208m";
-const string ANSI_GREEN = "[1;32m";
+const string ANSI_RESET = "\033[0m";
+const string ANSI_RED = "\033[1;31m";
+const string ANSI_YELLOW = "\033[1;33m";
+const string ANSI_PURPLE = "\033[1;35m";
+const string ANSI_ORANGE = "\033[38;5;208m";
+const string ANSI_GREEN = "\033[1;32m";
+const string ANSI_D_BLUE = "\033[38;5;23m";
+const string ANSI_FLAME = "\033[38;5;202m";
 ```
 
 ## Future Improvements
